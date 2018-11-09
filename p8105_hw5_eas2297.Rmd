@@ -84,8 +84,31 @@ Next we will create a `city_state` variable.
 
 ```{r}
 US_hom_data = homicide_data %>% 
-  mutate(city_state = str_c(city, state, sep = ", "))
+  mutate(state = toupper(state), city_state = str_c(city, state, sep = ", "))
 ```
+
+Using this new variable, we will summarize within cities to obtain the total number of homicides and the number of unsolved homicides (those for which the disposition is “Closed without arrest” or “Open/No arrest”).
+
+```{r}
+US_hom_data %>% 
+  group_by(city_state) %>% 
+  summarize(n_total = n())
+```
+
+This `group_by` shows 51 distinct city-state combinations when there should only be 50; moreover, the summary data shows 'Tulsa, AL' with 1 homicide. This seems like a mistake since 1 is inconsistent with the other `n_total` numbers, and 'Tulsa, AL' is also not a real place. This observartion will be dropped and we will re-do the summary.Furthermore, we also need a variable that indicates whether a homicide was unsolved.
+
+```{r}
+US_hom_data_50 = US_hom_data %>% 
+  filter(city_state != "Tulsa, AL") %>% 
+  mutate(unsolved = ifelse(disposition == "Closed without arrest" | disposition == "Open/No arrest", TRUE, FALSE))
+
+US_hom_data_50 %>% 
+  group_by(city_state) %>% 
+  summarize(n_total = n(), n_unsolved = sum(unsolved)) %>% 
+  arrange(desc(n_total)) %>% 
+  knitr::kable()
+```
+
 
 
 
