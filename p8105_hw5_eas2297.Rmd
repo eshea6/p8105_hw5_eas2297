@@ -15,3 +15,16 @@ knitr::opts_chunk$set(
 library(tidyverse)
 ```
 
+## Problem 1
+
+First we create a dataframe containing all of the file names.
+
+```{r}
+df = tibble(
+  file_name = list.files("./data")
+)
+```
+
+Next we iterate over file names and read in data for each subject using `purrr::map`. We will save the result as a new variable in the dataframe. 
+
+
