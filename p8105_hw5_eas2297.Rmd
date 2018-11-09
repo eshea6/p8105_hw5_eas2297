@@ -109,7 +109,7 @@ US_hom_data_50 %>%
   knitr::kable()
 ```
 
-For the city of Baltimore, MD we will now use the `prop.test` fuction to estimate the proportion of homicides that are unsolved; we save the output of prop.test as an R object, apply the broom::tidy function to this object and pull the estimated proportion and confidence intervals from the resulting tidy dataframe.
+For the city of Baltimore, MD we will now use the `prop.test` fuction to estimate the proportion of homicides that are unsolved; we save the output of prop.test as an R object, apply the `broom::tidy` function to this object and pull the estimated proportion and confidence intervals from the resulting tidy dataframe.
 
 ```{r}
 Baltimore_prop_data = US_hom_data_50 %>% 
@@ -125,6 +125,51 @@ prop_unsolved_Baltimore %>%
   select(estimate, conf.low, conf.high) %>% 
   knitr::kable()
 ```
+
+Next we will run `prop.test` for each city.
+
+```{r}
+prop_data = US_hom_data_50 %>% 
+ group_by(city_state) %>%
+  mutate(n_total = n(), n_unsolved = sum(unsolved)) %>% 
+  distinct(city_state, n_total, n_unsolved) 
+```
+
+```{r}
+filter_city = function(city) {
+  city_prop_data = prop_data %>% 
+    filter(city_state == city)
+}
+
+city_prop_data = map(prop_data$city_state, filter_city)
+```
+
+```{r}
+prop_test = function(city_prop_data, city_state) {
+  prop.test(city_prop_data$n_unsolved, city_prop_data$n_total) %>% 
+    broom::tidy() %>% 
+  select(estimate, conf.low, conf.high)
+}
+
+output = map_df(city_prop_data, prop_test)
+```
+
+Now we need to merge the two dataframes.
+
+```{r}
+prop_df_ID = prop_data %>% 
+  rowid_to_column("ID")
+
+output_ID = output %>% 
+  rowid_to_column("ID")
+
+df_merge = merge(prop_df_ID, output_ID, by = "ID")
+
+df_final = df_merge %>% 
+  select(-ID)
+```
+
+
 
 
 
