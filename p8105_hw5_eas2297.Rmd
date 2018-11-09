@@ -169,11 +169,20 @@ df_final = df_merge %>%
   select(-ID)
 ```
 
+Lastly, we will create a plot that shows the estimates and CIs for each city.
 
-
-
-
-
-
-  
+```{r}
+df_final %>% 
+  mutate(city_state = forcats::fct_reorder(city_state, estimate)) %>% 
+  ggplot(aes(x = city_state, y = estimate)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 6)) +
+  labs(
+    title = "Unsolved Homicides across 50 Large U.S. Cities",
+    x = "U.S. City",
+    y = "Proportion of Unsolved Homicide Cases",
+    caption = "Data from The Washington Post"
+  ) 
+```
 
