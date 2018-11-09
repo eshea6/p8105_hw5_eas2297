@@ -68,9 +68,27 @@ df_tidy %>%
   facet_grid(~arm)
 ```
 
-Based on this plot, we see that the experimental group saw increases in response over time, while the control group generally stayed the same over time with some fluctuations by week. 
+Based on this plot, we see that the experimental group saw increases in response over time, while the control group generally stayed the same over time with some fluctuations by week and possibly even a slight downward trend. 
 
 ## Problem 2
+
+First we need to read in the data.
+
+```{r}
+homicide_data = read_csv("./data/homicide-data.csv")
+```
+
+The raw data includes `ncol(homicide_data)` variables and `nrow(homicide_data)` observations; each observation represents an individual homicide case. Variables include a unique ID that incorporates location information, date the homicide was reported, victim information (last name, first name, race, age, sex), city, state, latitude and longitude of the incident, and the disposition (i.e. status) of the case. Unidentifiable characteristics are reported as 'Unknown'. 
+
+Next we will create a `city_state` variable.
+
+```{r}
+US_hom_data = homicide_data %>% 
+  mutate(city_state = str_c(city, state, sep = ", "))
+```
+
+
+
 
 
   
