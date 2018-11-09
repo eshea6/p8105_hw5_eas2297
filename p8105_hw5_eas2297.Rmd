@@ -13,6 +13,8 @@ knitr::opts_chunk$set(
 )
 
 library(tidyverse)
+
+theme_set(theme_bw() + theme(legend.position = "bottom"))
 ```
 
 ## Problem 1
@@ -21,10 +23,25 @@ First we create a dataframe containing all of the file names.
 
 ```{r}
 df = tibble(
-  file_name = list.files("./data")
+  file_name = list.files("./data", full.names = TRUE)
 )
 ```
 
 Next we iterate over file names and read in data for each subject using `purrr::map`. We will save the result as a new variable in the dataframe. 
+
+```{r}
+read_file = function(file_name) {
+  read_csv(file_name)
+}
+```
+
+```{r}
+df_untidy =  
+  df %>% 
+mutate(
+  file_data = map(file_name, read_file)
+) 
+```
+
 
 
